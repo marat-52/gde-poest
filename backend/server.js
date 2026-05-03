@@ -1,5 +1,3 @@
-══════════════════════════════════════════════
-
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
@@ -7,58 +5,37 @@ import 'dotenv/config';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-
-app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
-}));
-
+app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
 app.use(express.json());
 
-
 app.get('/restaurants', async (req, res) => {
-  const {
-    city = 'Казань',
-    category = '',
-    price = '',
-  } = req.query;
+  const { city = 'Казань', category = '', price = '' } = req.query;
+
+  const coords = {
+    'Казань': '49.1221,55.7887',
+    'Москва': '37.6173,55.7558',
+    'Helsinki': '24.9384,60.1699',
+  };
+
+  const point = coords[city] || coords['Казань'];
+  const searchQuery = category ? `${category} ресторан` : 'ресторан';
+
+  const params = new URLSearchParams({
+    q: searchQuery,
+    point: point,
+    radius: 5000,
+    type: 'branch',
+    fields: 'items.name,items.address,items.reviews,items.rubrics,items.photos',
+    key: process.env.TWOGIS_API_KEY,
+    page_size: 20,
+  });
 
   try {
-
-
-    const searchQuery = category ? `${category} ресторан` : 'ресторан';
-
-    const coords = {
-      'Казань': '49.1221,55.7887',
-      'Москва': '37.6173,55.7558',
-      'Helsinki': '24.9384,60.1699',
-    };
-
-    const point = coords[city] || coords['Казань'];
-
-    const params = new URLSearchParams({
-      q: searchQuery,
-      point: point,
-      radius: 5000,
-      type: 'branch',
-      fields: 'items.name,items.address,items.reviews,items.rubrics,items.photos',
-      key: process.env.TWOGIS_API_KEY,
-      page_size: 20,
-    });
-
-
-
-    const response = await fetch(
-      `https://catalog.api.2gis.com/3.0/items?${params}`
-    );
-
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('2GIS error:', errText);
-      throw new Error(`2GIS API error: ${response.status}`);
-    }
-
+    const response = await fetch(`https://catalog.api.2gis.com/3.0/items?${params}`);
     const data = await response.json();
 
+    console.log('2GIS response code:', data.meta?.code);
+    console.log('Items count:', data.result?.items?.length);
 
     const restaurants = (data.result?.items || []).map(item => ({
       id: item.id,
@@ -68,28 +45,20 @@ app.get('/restaurants', async (req, res) => {
       reviews: item.reviews?.rating_summaries?.[0]?.reviews_count || 0,
       image: item.photos?.[0]?.preview_urls?.url || null,
       categories: item.rubrics?.map(r => r.name) || [],
-      price: parseInt(price) || null,
     }));
 
     res.json({ restaurants, total: restaurants.length });
-
   } catch (err) {
     console.error('Error:', err.message);
-    res.status(503).json({
-      error: 'Сервис временно недоступен',
-      detail: err.message,
-    });
+    res.status(503).json({ error: 'Сервис недоступен' });
   }
 });
 
-// ─── HEALTH CHECK ──────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', ts: new Date().toISOString() });
 });
 
-// ─── ЗАПУСК ────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
-  console.log(`   FRONTEND_URL: ${process.env.FRONTEND_URL || '*'}`);
-  console.log(`   2GIS key: ${process.env.TWOGIS_API_KEY ? 'задан ✓' : 'НЕ ЗАДАН ✗'}`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`2GIS key: ${process.env.TWOGIS_API_KEY ? 'OK' : 'MISSING'}`);
 });
