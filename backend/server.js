@@ -12,9 +12,9 @@ app.get('/restaurants', async (req, res) => {
   const { city = 'Казань', category = '', price = '' } = req.query;
 
   const coords = {
-    'Казань': '49.1221,55.7887',
-    'Москва': '37.6173,55.7558',
-    'Helsinki': '24.9384,60.1699',
+  'Казань': '49.106414,55.796127',
+  'Москва': '37.617698,55.755864',
+  'Helsinki': '24.938379,60.169857',
   };
 
   const point = coords[city] || coords['Казань'];
