@@ -27,7 +27,7 @@ app.get('/restaurants', async (req, res) => {
     type: 'branch',
     fields: 'items.name,items.address,items.reviews,items.rubrics,items.photos',
     key: process.env.TWOGIS_API_KEY,
-    page_size: 20,
+    page_size: 10,
   });
 
   try {
