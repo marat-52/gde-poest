@@ -652,23 +652,21 @@ function renderCards(data) {
   const priceMap = { 1: '₽', 2: '₽₽', 3: '₽₽₽' };
 
   grid.innerHTML = data.map(r => `
-    <div class="card" onclick="showSpotlight(${r.id})">
+    <div class="card" onclick="showSpotlight('${r.id}')">
       <div class="card-top">
-        <span class="card-emoji">${r.emoji}</span>
+        <span class="card-emoji">🍽️</span>
         <button class="fav-btn ${favs.includes(r.id) ? 'faved' : ''}"
-          onclick="event.stopPropagation(); toggleFav(${r.id}, this)"
+          onclick="event.stopPropagation(); toggleFav('${r.id}', this)"
           title="В избранное">♥</button>
       </div>
       <div class="card-name">${r.name}</div>
-      <div class="card-cuisine">${r.cuisine}</div>
+      <div class="card-cuisine">${r.categories?.[0] || 'Ресторан'}</div>
       <div class="card-row">
-        <span class="rating-num">★ ${r.rating}</span>
+        <span class="rating-num">★ ${r.rating || '—'}</span>
         <span>·</span>
         <span>${r.reviews} отз.</span>
-        <span>·</span>
-        <span class="price-tag">${priceMap[r.price] || '—'}</span>
       </div>
-      <div class="card-addr">📍 ${r.addr}</div>
+      <div class="card-addr">📍 ${r.address}</div>
     </div>
   `).join('');
 
