@@ -42,10 +42,10 @@ app.get('/restaurants', async (req, res) => {
     const restaurants = (data.result?.items || []).map(item => ({
       id: item.id,
       name: item.name,
-      address: item.address?.name || '',
-      rating: item.reviews?.rating_summaries?.[0]?.rating?.toFixed(1) || null,
-      reviews: item.reviews?.rating_summaries?.[0]?.reviews_count || 0,
-      image: item.photos?.[0]?.preview_urls?.url || null,
+      address: item.address_name || '',
+      rating: item.reviews?.general_rating?.toFixed(1) || null,
+      reviews: item.reviews?.general_review_count || 0,
+      image: null,
       categories: item.rubrics?.map(r => r.name) || [],
     }));
 
