@@ -687,13 +687,12 @@ function pickRandom() {
 
 // ── SPOTLIGHT ──────────────────────────────────
 function showSpotlight(id) {
-  const r = MOCK.find(x => x.id === id);
+  const r = currentData.find(x => x.id === id);
   if (!r) return;
-  const priceMap = { 1: '₽', 2: '₽₽', 3: '₽₽₽' };
-  document.getElementById('sp-emoji').textContent = r.emoji;
+  document.getElementById('sp-emoji').textContent = '🍽️';
   document.getElementById('sp-name').textContent = r.name;
   document.getElementById('sp-sub').textContent =
-    `${r.cuisine} · ${r.addr} · ${priceMap[r.price]} · ★ ${r.rating}`;
+    `${r.categories?.[0] || 'Ресторан'} · ${r.address} · ★ ${r.rating || '—'}`;
   document.getElementById('spotlight').classList.add('show');
   document.getElementById('spotlight').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
