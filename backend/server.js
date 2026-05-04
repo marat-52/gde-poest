@@ -33,6 +33,7 @@ app.get('/restaurants', async (req, res) => {
   try {
     const response = await fetch(`https://catalog.api.2gis.com/3.0/items?${params}`);
     const data = await response.json();
+    console.log('First item:', JSON.stringify(data.result?.items?.[0]));
     console.log('2GIS full response:', JSON.stringify(data));
 
     console.log('2GIS response code:', data.meta?.code);
